@@ -28,7 +28,7 @@ public class DockerProcessInvoker : IProcessInvoker
             var dockerProcesses = Process.GetProcessesByName(DockerProcessName);
             if (dockerProcesses != null && dockerProcesses.Length > 0)
             {
-                throw new ExceptionWithHint(DockerDesktopHints.AlreadyStarted);
+                throw new ExceptionWithHint(DockerDesktop.Hints.AlreadyStarted);
             }
             else
             {

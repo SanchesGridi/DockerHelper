@@ -1,8 +1,10 @@
 ﻿using Docker.DotNet.Models;
 using DockerHelper.Core.Events;
+using DockerHelper.Core.Exceptions;
 using DockerHelper.Core.Extensions;
 using DockerHelper.Core.Mvvm.ViewModels;
 using DockerHelper.Core.Services;
+using DockerHelper.Core.Services.Interfaces;
 using DockerHelper.Core.Utils;
 using DockerHelper.Modules.Docker.Enums;
 using DockerHelper.Modules.Docker.Models;
@@ -14,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -21,9 +24,14 @@ namespace DockerHelper.Modules.Docker.ViewModels.Controls;
 
 public class ContainersControlViewModel : ThreadSaveViewModel
 {
+    private const string MessageBoxTitle = "Docker container event tracking error";
+
+    private readonly IMessageBoxService _messageBoxService;
     private readonly IEventAggregator _eventAggregator;
     private readonly ViewHelper _viewHelper;
     private readonly List<Message> _messages;
+
+    private CancellationTokenSource _monitorCts;
 
     private Visibility _progressVisibility = Visibility.Hidden;
     public Visibility ProgressVisibility
@@ -63,9 +71,14 @@ public class ContainersControlViewModel : ThreadSaveViewModel
     public DelegateCommand ForceRemoveCommand { get; }
     public DelegateCommand PruneCommand { get; }
     public DelegateCommand CopyContainerEventsCommand { get; }
+    public DelegateCommand RestartMonitorCommand { get; }
 
-    public ContainersControlViewModel(IEventAggregator eventAggregator, ViewHelper viewHelper)
+    public ContainersControlViewModel(
+        IMessageBoxService messageBoxService,
+        IEventAggregator eventAggregator,
+        ViewHelper viewHelper)
     {
+        _messageBoxService = messageBoxService;
         _eventAggregator = eventAggregator;
         _viewHelper = viewHelper;
         _messages = new();
@@ -74,8 +87,9 @@ public class ContainersControlViewModel : ThreadSaveViewModel
         ForceRemoveCommand = new DelegateCommand(ForceRemoveCommandExecute, () => SelectedContainer != null);
         PruneCommand = new DelegateCommand(PruneCommandExecute);
         CopyContainerEventsCommand = new DelegateCommand(CopyContainerEventsCommandExecute);
+        RestartMonitorCommand = new DelegateCommand(RestartMonitorCommandExecute);
 
-        MonitorContainersAsync().Await(handler: _eventAggregator.GetEvent<ExceptionEvent>().Publish);
+        MonitorContainersAsync().Await(handler: StartMonitorContainersHandler);
     }
 
     private async void ContainersCommandExecute()
@@ -141,6 +155,39 @@ public class ContainersControlViewModel : ThreadSaveViewModel
         }
     }
 
+    private async void RestartMonitorCommandExecute()
+    {
+        var blocked = true;
+        try
+        {
+            ChangeOperationsPanelState(OperationState.Blocked);
+            await LoadContainersAsync();
+            ChangeOperationsPanelState(OperationState.Unblocked);
+            blocked = false;
+            await MonitorContainersAsync(true);
+        }
+        catch (TimeoutException ex)
+        {
+            _eventAggregator.GetEvent<ExceptionEvent>().Publish(new ExceptionWithHint(DockerDesktop.Hints.Run, ex));
+
+            if (_messageBoxService.Show(DockerDesktop.Questions.Start))
+            {
+                _eventAggregator.GetEvent<DockerDesktopStartEvent>().Publish();
+            }
+        }
+        catch (Exception ex)
+        {
+            _eventAggregator.GetEvent<ExceptionEvent>().Publish(ex);
+        }
+        finally
+        {
+            if (blocked)
+            {
+                ChangeOperationsPanelState(OperationState.Unblocked);
+            }
+        }
+    }
+
     private void ChangeOperationsPanelState(OperationState state)
     {
         switch (state)
@@ -156,6 +203,24 @@ public class ContainersControlViewModel : ThreadSaveViewModel
         }
     }
 
+    private void StartMonitorContainersHandler(Exception ex)
+    {
+        var exceptionEvent = _eventAggregator.GetEvent<ExceptionEvent>();
+        if (ex is TimeoutException)
+        {
+            exceptionEvent.Publish(new ExceptionWithHint(DockerDesktop.Hints.Run, ex));
+
+            if (_messageBoxService.Show(DockerDesktop.Questions.Start, MessageBoxTitle))
+            {
+                _eventAggregator.GetEvent<DockerDesktopStartEvent>().Publish();
+            }
+        }
+        else
+        {
+            exceptionEvent.Publish(ex);
+        }
+    }
+
     private async Task LoadContainersAsync()
     {
         Containers.Clear();
@@ -168,9 +233,9 @@ public class ContainersControlViewModel : ThreadSaveViewModel
         _eventAggregator.GetEvent<ListContainersEvent>().Publish(containers);
     }
 
-    private async Task MonitorContainersAsync()
+    private async Task MonitorContainersAsync(bool command = false)
     {
-        await DockerContainers.MonitorAsync(new Progress<Message>(async m =>
+        var progress = new Progress<Message>(async m =>
         {
             var containerKey = Consts.Keys.ContainerKey;
             var emptyKey = Consts.Keys.EmptyKey;
@@ -196,6 +261,24 @@ public class ContainersControlViewModel : ThreadSaveViewModel
                     await LoadContainersAsync();
                 }
             }
-        }));
+        });
+
+        if (command)
+        {
+            if (_monitorCts == null)
+            {
+                _monitorCts = new CancellationTokenSource();
+            }
+            else
+            {
+                _monitorCts.Cancel();
+                _monitorCts = new CancellationTokenSource();
+            }
+            await DockerContainers.MonitorAsync(progress, new ContainerEventsParameters(), _monitorCts.Token);
+        }
+        else
+        {
+            await DockerContainers.MonitorAsync(progress);
+        }
     }
 }

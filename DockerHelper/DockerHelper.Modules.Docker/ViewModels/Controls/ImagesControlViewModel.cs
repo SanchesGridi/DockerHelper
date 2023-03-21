@@ -123,12 +123,12 @@ public class ImagesControlViewModel : ThreadSaveViewModel
         }
         catch (TimeoutException ex)
         {
-            _eventAggregator.GetEvent<ExceptionEvent>().Publish(new ExceptionWithHint(DockerDesktopHints.Run, ex));
+            _eventAggregator.GetEvent<ExceptionEvent>().Publish(new ExceptionWithHint(DockerDesktop.Hints.Run, ex));
             daemonException = true;
         }
         catch (DockerApiException ex) when (ex.Message == DockerConfig.EngineException)
         {
-            _eventAggregator.GetEvent<ExceptionEvent>().Publish(new ExceptionWithHint(DockerDesktopHints.Troubleshoot, ex));
+            _eventAggregator.GetEvent<ExceptionEvent>().Publish(new ExceptionWithHint(DockerDesktop.Hints.Troubleshoot, ex));
             daemonException = true;
         }
         catch (Exception ex)
@@ -139,7 +139,7 @@ public class ImagesControlViewModel : ThreadSaveViewModel
         {
             ProgressVisibility = Visibility.Hidden;
 
-            if (daemonException && _messageBoxService.Show("Do you want to open the (Docker Desktop) application?"))
+            if (daemonException && _messageBoxService.Show(DockerDesktop.Questions.Start))
             {
                 _eventAggregator.GetEvent<DockerDesktopStartEvent>().Publish();
             }

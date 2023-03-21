@@ -6,20 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DockerHelper.Modules.Docker.Utils;
 
 public static class DockerContainers
 {
-    public static async Task MonitorAsync(IProgress<Message> progress, ContainerEventsParameters? parameters = null)
+    public static async Task MonitorAsync(IProgress<Message> progress, ContainerEventsParameters? parameters = null, CancellationToken token = default)
     {
         if (progress == null)
         {
             throw new ArgumentNullException(nameof(progress));
         }
         using var client = new DockerClientConfiguration(new Uri(DockerConfig.WindowsPipe)).CreateClient();
-        await client.System.MonitorEventsAsync(parameters ??= new(), progress);
+        await client.System.MonitorEventsAsync(parameters ??= new(), progress, token);
     }
 
     public static async Task ForceRemoveAsync(string id)

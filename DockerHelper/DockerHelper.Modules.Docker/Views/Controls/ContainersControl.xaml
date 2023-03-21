@@ -18,13 +18,14 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"
+        <ListBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
                  x:Name="_containers_console_"
                  Margin="5"
                  Background="Black"
@@ -45,7 +46,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+        <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
                      Margin="5"
                      IsIndeterminate="True"
                      Visibility="{Binding ProgressVisibility}"/>
@@ -73,5 +74,11 @@
                 Content="Copy container events"
                 IsEnabled="{Binding IsContainerOperationsEnabled}"
                 Command="{Binding CopyContainerEventsCommand}"/>
+        <Button Grid.Row="2" Grid.Column="4"
+                Margin="5"
+                MaxHeight="30"
+                Content="Restart event monitor"
+                IsEnabled="{Binding IsContainerOperationsEnabled}"
+                Command="{Binding RestartMonitorCommand}"/>
     </Grid>
 </UserControl>
