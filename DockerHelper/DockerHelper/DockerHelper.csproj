@@ -8,6 +8,7 @@
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DockerHelper.Modules.Docker\DockerHelper.Modules.Docker.csproj" />
     <ProjectReference Include="..\DockerHelper.Modules.Exceptions\DockerHelper.Modules.Exceptions.csproj" />
     <ProjectReference Include="..\DockerHelper.Modules.History\DockerHelper.Modules.History.csproj" />
   </ItemGroup>

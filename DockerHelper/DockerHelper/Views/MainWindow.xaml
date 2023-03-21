@@ -23,6 +23,30 @@
             <ColumnDefinition Width="6*"/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
+        <TabControl Grid.Row="0" Grid.Column="0"
+                    TabStripPlacement="Bottom"
+                    Background="Gray"
+                    Margin="5">
+            <TabItem Header="Docker Images">
+                <TabItem.Content>
+                    <ScrollViewer x:Name="_images_scroll_viewer_"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.DockerImagesRegion}" />
+                    </ScrollViewer>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Header="Docker Containers">
+                <TabItem.Content>
+                    <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.DockerContainersRegion}"/>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Header="Docker Settings">
+                <TabItem.Content>
+                    <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.DockerSettingsRegion}"/>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
         <ContentControl Grid.Row="1" Grid.Column="0"
                         Margin="5"
                         prism:RegionManager.RegionName="{x:Static core:RegionNames.ExceptionsRegion}"/>

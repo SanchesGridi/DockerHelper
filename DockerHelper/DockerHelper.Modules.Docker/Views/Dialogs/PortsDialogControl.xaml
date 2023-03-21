@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="DockerHelper.Modules.Docker.Views.Dialogs.PortsDialogControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d"
+             xmlns:m="clr-namespace:DockerHelper.Modules.Docker.Models"
+             xmlns:vm="clr-namespace:DockerHelper.Modules.Docker.ViewModels.Dialogs"
+             d:DataContext="{d:DesignInstance Type=vm:PortsDialogControlViewModel}"
+             d:Background="#454545"
+             d:DesignHeight="500"
+             d:DesignWidth="400">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="Title" Value="{Binding Title}"/>
+            <Setter Property="Background" Value="#454545"/>
+            <Setter Property="Height" Value="500"/>
+            <Setter Property="Width" Value="400"/>
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Grid.Column="0"
+               VerticalAlignment="Center"
+               Content="External port:"/>
+        <TextBox Grid.Row="0" Grid.Column="1"
+                 Margin="2.5,0,0,0"
+                 VerticalAlignment="Center"
+                 Text="{Binding ExternalPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Row="1" Grid.Column="0"
+               VerticalAlignment="Center"
+               Content="Internal port:"/>
+        <TextBox Grid.Row="1" Grid.Column="1"
+                 Margin="2.5,0,0,0"
+                 VerticalAlignment="Center"
+                 Text="{Binding InternalPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Row="2" Grid.Column="1"
+                Margin="2.5,0,0,5"
+                VerticalAlignment="Center"
+                Content="Add"
+                Command="{Binding AddPortPairCommand}"/>
+        <ListBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                 x:Name="_ports_console_"
+                 Background="Black"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 ToolTipService.ShowDuration="750"
+                 ToolTipService.InitialShowDelay="100"
+                 SelectedItem="{Binding SelectedPortPair}"
+                 ItemsSource="{Binding PortPairs}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="m:PortBindingModel">
+                    <TextBlock>
+                        <TextBlock.Inlines>
+                            <Run Foreground="LightGreen" Text="-p"/>
+                            <Run Foreground="GreenYellow" Text="{Binding ExternalPort}"/>
+                            <Run Foreground="GreenYellow" Text=":"/>
+                            <Run Foreground="GreenYellow" Text="{Binding InternalPort}"/>
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding RemovePortPairCommand}"/>
+            </ListBox.InputBindings>
+            <ListBox.ToolTip>
+                <ToolTip Foreground="LightGreen"
+                         Background="Black"
+                         BorderBrush="LightGreen"
+                         BorderThickness="0.5"
+                         Placement="Top"
+                         Content="Select port pair and press delete"
+                         Visibility="{Binding ToolTipVisibility}"/>
+            </ListBox.ToolTip>
+        </ListBox>
+        <Button Grid.Row="4" Grid.Column="0"
+                Margin="0,5,2.5,0"
+                VerticalAlignment="Center"
+                Content="Save"
+                Command="{Binding SaveCommand}"/>
+        <Button Grid.Row="4" Grid.Column="1"
+                Margin="2.5,5,0,0"
+                VerticalAlignment="Center"
+                Content="Close"
+                Command="{Binding CloseCommand}"/>
+    </Grid>
+</UserControl>

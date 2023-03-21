@@ -1,6 +1,7 @@
 ﻿using DockerHelper.Core.Services;
 using DockerHelper.Core.Services.Implementations;
 using DockerHelper.Core.Services.Interfaces;
+using DockerHelper.Modules.Docker;
 using DockerHelper.Modules.Exceptions;
 using DockerHelper.Modules.History;
 using DockerHelper.ViewModels;
@@ -23,6 +24,8 @@ public partial class App
         containerRegistry.RegisterForNavigation<MainWindow, MainWindowViewModel>();
 
         containerRegistry.RegisterSingleton<IViewProvider, ViewProvider>();
+        containerRegistry.RegisterSingleton<IMessageBoxService, MessageBoxService>();
+        containerRegistry.RegisterSingleton<IFolderService, FolderService>();
         containerRegistry.RegisterSingleton<ViewHelper>();
     }
 
@@ -30,6 +33,7 @@ public partial class App
     {
         base.ConfigureModuleCatalog(moduleCatalog);
 
+        moduleCatalog.AddModule<DockerModule>();
         moduleCatalog.AddModule<ExceptionsModule>();
         moduleCatalog.AddModule<HistoryModule>();
     }
