@@ -1,18 +1,7 @@
-﻿using Prism.Mvvm;
+﻿using DockerHelper.Core.Mvvm.ViewModels;
 
 namespace DockerHelper.ViewModels;
 
-public class MainWindowViewModel : BindableBase
+public class MainWindowViewModel : ThreadSaveViewModel
 {
-    private string _title = "Prism Application";
-    public string Title
-    {
-        get { return _title; }
-        set { SetProperty(ref _title, value); }
-    }
-
-    public MainWindowViewModel()
-    {
-
-    }
 }

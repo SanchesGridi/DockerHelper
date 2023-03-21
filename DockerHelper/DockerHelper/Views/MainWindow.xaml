@@ -26,5 +26,8 @@
         <ContentControl Grid.Row="1" Grid.Column="0"
                         Margin="5"
                         prism:RegionManager.RegionName="{x:Static core:RegionNames.ExceptionsRegion}"/>
+        <ContentControl Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                        Margin="5"
+                        prism:RegionManager.RegionName="{x:Static core:RegionNames.HistoryRegion}"/>
     </Grid>
 </Window>

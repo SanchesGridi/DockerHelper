@@ -9,5 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DockerHelper.Modules.Exceptions\DockerHelper.Modules.Exceptions.csproj" />
+    <ProjectReference Include="..\DockerHelper.Modules.History\DockerHelper.Modules.History.csproj" />
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 using DockerHelper.Core.Services.Implementations;
 using DockerHelper.Core.Services.Interfaces;
 using DockerHelper.Modules.Exceptions;
+using DockerHelper.Modules.History;
 using DockerHelper.ViewModels;
 using DockerHelper.Views;
 using Prism.Ioc;
@@ -30,5 +31,6 @@ public partial class App
         base.ConfigureModuleCatalog(moduleCatalog);
 
         moduleCatalog.AddModule<ExceptionsModule>();
+        moduleCatalog.AddModule<HistoryModule>();
     }
 }
