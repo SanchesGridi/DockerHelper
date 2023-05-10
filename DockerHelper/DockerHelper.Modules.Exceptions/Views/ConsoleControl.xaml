@@ -35,7 +35,7 @@
                  VirtualizingPanel.VirtualizationMode="Recycling"
                  ItemsSource="{Binding Exceptions}">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="m:ExceptionModel">
+                <DataTemplate DataType="m:EntryModel">
                     <TextBlock VerticalAlignment="Center"
                                Foreground="{Binding Brush}"
                                Text="{Binding Message}"/>
